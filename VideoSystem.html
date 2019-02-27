@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Obligatorias -->
+	<title>VideoSystem</title>
+	<meta charset="UTF-8">
+	<meta name="author" content="Inmaculada Plaza Sosa">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Personalizado -->
+	<link rel="stylesheet" href="css/mi_css.css">
+						
+</head>
+<body>
+    <header class="container-fluid">
+        <div class="container" id="cabecera">
+            <a href="VideoSystem.html"><img src="img/Logo.png" alt="Icono VideoSystem" width="300px" height="200px"></a>
+            <img src="img/generatedtext2.png" alt="NombreCabecera">
+        </div>
+    </header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light container">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto" id="alinear">
+                <li class="nav-item active">   
+                    <a class="nav-link" href="#" onclick="showHomePage()">Inicio<span class="sr-only"></span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="showActors()">Actores</a>
+                </li>
+                <li class="nav-item"> 
+                    <a class="nav-link" href="#" onclick="showDirectors()">Directores</a>
+                </li>
+                <li class="nav-item"> 
+                    <a class="nav-link" href="#" onclick="showResource()">Recursos</a>
+                </li>
+                  
+            </ul>
+        </div>
+    </nav>
+    <main class="container">
+        <div class="row">
+            <div id="menuvertical" class="col-md-3">
+                <div id="formularioInicioSesion">
+                    <!--FORMULARIO DE INICIO DE SESION-->
+                </div>
+                <div class="list-group mt-4">
+                    <!--CONTENIDO DEL MENU VERTICAL-->
+                </div>
+            </div>
+            <div id="contenidoprincipal" class="col-md-9">
+                <h1 id="tituloprincipal"></h1>
+                <div id="tarjetasprincipal" class="row">
+                    <!--CONTENIDO PRINCIPAL-->
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <footer class="container-fluid py-3">
+        <div class="container">
+            <h5>VideoSystem Company 2019</h5>
+        </div>
+    </footer>
+  
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->  
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Personalizado -->
+    <script src="js/BaseException.js"></script> <!-- Excepciones genéricas -->
+    <script src="js/ObjectsVideoSystem.js"></script> <!-- Importamos los objetos VideoStreaming -->
+    <script src="js/VideoSystem.js"></script> <!-- Importamos VideoSystem -->
+    <script src="js/DOM.js"></script>
+    <script src="js/BOM.js"></script>
+    <script src="js/Formularios.js"></script>
+</body>
+</html>
+
+

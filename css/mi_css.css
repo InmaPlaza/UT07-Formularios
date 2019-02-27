@@ -1,0 +1,127 @@
+@charset "utf-8";
+
+header {
+    background-color: #A6ACAF;
+}
+
+body {
+    background-color: #CACFD2;
+}
+
+footer{
+     background-color: #A6ACAF;
+}
+
+footer > div >h5{
+    text-align: center;
+}
+
+.d-flex{
+    background-color: white;
+}
+
+#cabecera{
+    display: block;
+    margin: auto;
+}
+
+#tituloprincipal{
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+#alinear{
+    width: 100%;
+}
+
+li.nav-item{
+    width: 25%;
+    text-align: center;
+}
+
+a.nav-link{
+    display: inline-block;
+}
+
+li.active{
+    background-color: #8EAEBF;
+}
+
+li:hover {
+    background-color: #E5E7E9;
+}
+
+.navbar{
+    padding: 0px;
+}
+
+
+#papel{
+    text-align: center;
+}
+
+.btn-link{
+    color: #21618C;
+}
+
+.navbar-light .navbar-nav .active>.nav-link{
+    color: #21618C;
+}
+
+.navbar-light .navbar-nav .nav-link{
+    color: #21618C;
+}
+
+h1.my-4{
+    visibility: hidden;
+}
+
+#cerrar {
+    margin-top: 25px;
+}
+
+#formularioInicioSesion{
+    margin-top: 97px;
+}
+
+#IniciarSesion{
+    background-color: white;
+    padding: 5px;
+}
+
+#botonIS, #botonCS{
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #8EAEBF;
+    background-color: #8EAEBF;
+    width: 100%;
+}
+
+#tituloFormulario{
+    text-align: center;
+}
+
+#formulario{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid grey;
+    background-color: white;
+    border-radius: 5px;
+}
+
+#botonAC{
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #8EAEBF;
+    background-color: #8EAEBF;
+    width: 100%;
+}
+
+.botonBorrar{
+    border: 0;
+    background-color: inherit;
+}
+
+.error{
+    color: red;
+}
