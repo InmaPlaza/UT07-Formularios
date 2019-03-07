@@ -124,6 +124,13 @@ function initPopulate(){
 	/* INICIO DE LAS FUNCIONES DE VIDEOSYSTEM */
 	var video = VideoSystem.getInstance();
 	video.name = "VIDEOCLUB METRO";
+
+	video.addResource(resource);
+	video.addResource(resource1);
+	video.addResource(resource2);
+
+	video.addSeason(season);
+	video.addSeason(season1);
 		
 	//Añadimos las categorias
 	video.addCategory(category);
@@ -530,6 +537,10 @@ function showActor(){
 			apellido.setAttribute("class","card-text");
 			apellido.appendChild(document.createTextNode("Apellido: " + actor.value.lastname1));
 
+			var apellido2 = document.createElement("p");
+			apellido2.setAttribute("class","card-text");
+			apellido2.appendChild(document.createTextNode("Apellido 2: " + actor.value.lastname2));
+
 			var fechaNac = document.createElement("p");
 			fechaNac.setAttribute("class","card-text");
 			fechaNac.appendChild(document.createTextNode("Fecha de Nacimiento: " + actor.value.born.toLocaleDateString()));
@@ -549,6 +560,7 @@ function showActor(){
 			divImagen.appendChild(div2);
 			div2.appendChild(nombre);
 			div2.appendChild(apellido);
+			div2.appendChild(apellido2);
 			div2.appendChild(fechaNac);
 			div2.appendChild(imagen);
 			div2.appendChild(titulo);
@@ -631,6 +643,10 @@ function showDirector(){
 			apellido.setAttribute("class","card-text");
 			apellido.appendChild(document.createTextNode("Apellido: " + director.value.lastname1));
 
+			var apellido2 = document.createElement("p");
+			apellido2.setAttribute("class","card-text");
+			apellido2.appendChild(document.createTextNode("Apellido 2: " + director.value.lastname2));
+
 			var fechaNac = document.createElement("p");
 			fechaNac.setAttribute("class","card-text");
 			fechaNac.appendChild(document.createTextNode("Fecha de Nacimiento: " + director.value.born.toLocaleDateString()));
@@ -650,6 +666,7 @@ function showDirector(){
 			divImagen.appendChild(div2);
 			div2.appendChild(nombre);
 			div2.appendChild(apellido);
+			div2.appendChild(apellido2);
 			div2.appendChild(fechaNac);
 			div2.appendChild(imagen);
 			div2.appendChild(titulo);

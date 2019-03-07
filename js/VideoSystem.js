@@ -156,6 +156,28 @@ var VideoSystem = (function (){
 				}		
 			});
 
+			var _resources = [];
+			Object.defineProperty(this, 'resources',{
+				get:function(){
+					return _resources;
+				}
+			});
+
+			this.addResource = function(resource){
+				_resources.push(resource);
+			}
+
+			var _seasons = [];
+			Object.defineProperty(this, 'seasons',{
+				get:function(){
+					return _seasons;
+				}
+			});
+
+			this.addSeason = function(season){
+				_seasons.push(season);
+			}
+
 			/* Definición del atributo categories como array para contener todas las categorías del gestor. */
 			var _categories = []; //array de categorías.
 
@@ -482,7 +504,7 @@ var VideoSystem = (function (){
 				}		
 
 				function compareElements(element) {
-				  return (element.director.name === person.name)
+				  return (element.director.name === person.name || element.director.lastname1 === person.lastname1)
 				}
 				
 				return _directors.findIndex(compareElements);		

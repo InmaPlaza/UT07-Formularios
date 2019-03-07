@@ -640,6 +640,9 @@ function FormModificarCategoria(){
 
 	var formulario = document.createElement("form");
 	formulario.setAttribute("id","formulario");
+	var p = document.createElement("p");
+	p.setAttribute("id","excepcion");
+	p.setAttribute("class","text-center font-weight-bold");
 	var tabla = document.createElement("table");
 	tabla.setAttribute("class","table table-bordered table-hover");
 	var thead = document.createElement("thead");
@@ -654,6 +657,7 @@ function FormModificarCategoria(){
     tbody.setAttribute("id","miTabla");
 
 	contenido.appendChild(formulario);
+	formulario.appendChild(p);
 	formulario.appendChild(tabla);
 	tabla.appendChild(thead);
 	tabla.appendChild(tr);
@@ -671,13 +675,13 @@ function FormModificarCategoria(){
 		var inputNombre = document.createElement("input");
 		inputNombre.setAttribute("class","form-control");
 		inputNombre.setAttribute("type","text");
-		inputNombre.setAttribute("id","inputNombre");
+		inputNombre.setAttribute("id","inputNombre" + categoria.value.name);
 		inputNombre.setAttribute("value",categoria.value.name);
 
 		var tdDesc = document.createElement("td");
 		var inputDesc = document.createElement("textarea");
 		inputDesc.setAttribute("class","form-control");
-		inputDesc.setAttribute("id","inputDesc");
+		inputDesc.setAttribute("id","inputDesc" + categoria.value.name);
 		inputDesc.appendChild(document.createTextNode(categoria.value.description));
 		inputDesc.setAttribute("cols","50");
 		inputDesc.setAttribute("rows","4");
@@ -687,13 +691,12 @@ function FormModificarCategoria(){
 		button.setAttribute("type","button");
 		button.setAttribute("class","btn botonBorrar p-0");
 		button.setAttribute("value",categoria.value.name);
-		//button.addEventListener("click", ModificarCategoria);
+		button.addEventListener("click", ModificarCategoria);
 
 		var img = document.createElement("img");
 		img.setAttribute("class","img-fluid");
 		img.setAttribute("src","img/modificar.png");
 		img.setAttribute("alt",categoria.value.name);
-		//img.setAttribute("style","width: 25px;");
 
 		tbody.appendChild(tr);
 		tr.appendChild(tdNombre);
@@ -709,7 +712,25 @@ function FormModificarCategoria(){
 }
 
 function ModificarCategoria(){
+	var nombreCatMod = this.value;
+	var nombre = document.getElementById("inputNombre" + this.value).value;
+	var desc = document.getElementById("inputDesc" + this.value).value;
 
+	var boolean = false;
+	var categorias = video.categories;
+	var categoria = categorias.next();
+
+	while((categoria.done !== true) && (!boolean)){
+		if (categoria.value.name == nombreCatMod) {
+
+            categoria.value.name = nombre;
+            categoria.value.description = desc;
+
+			boolean = true;
+		}
+		categoria = categorias.next();
+	}
+	categoriesMenuPopulate();
 }
 
 function FormEliminarCategoria(){
@@ -728,6 +749,9 @@ function FormEliminarCategoria(){
 
 	var formulario = document.createElement("form");
 	formulario.setAttribute("id","formulario");
+	var p = document.createElement("p");
+	p.setAttribute("id","excepcion");
+	p.setAttribute("class","text-center font-weight-bold");
 	var tabla = document.createElement("table");
 	tabla.setAttribute("class","table table-bordered table-hover");
 	var thead = document.createElement("thead");
@@ -740,6 +764,7 @@ function FormEliminarCategoria(){
     tbody.setAttribute("id","miTabla");
 
 	contenido.appendChild(formulario);
+	formulario.appendChild(p);
 	formulario.appendChild(tabla);
 	tabla.appendChild(thead);
 	tabla.appendChild(tr);
@@ -753,14 +778,15 @@ function FormEliminarCategoria(){
 	while(categoria.done !== true){
 		var tr = document.createElement("tr");
 		var tdNombre = document.createElement("td");
-		tdNombre.setAttribute("id",categoria.value.name);
 		tdNombre.appendChild(document.createTextNode(categoria.value.name));
 		var td = document.createElement("td");
+		td.setAttribute("id","botonesEliminar" + categoria.value.name);
+		td.setAttribute("style","width:30%;")
 		var button = document.createElement("button");
 		button.setAttribute("type","button");
 		button.setAttribute("class","btn botonBorrar p-0");
 		button.setAttribute("value",categoria.value.name);
-		button.addEventListener("click", EliminarCategoria);
+		button.addEventListener("click", BotonesEliminar);
 
 		var img = document.createElement("img");
 		img.setAttribute("class","img-fluid");
@@ -779,12 +805,39 @@ function FormEliminarCategoria(){
 }
 
 function EliminarCategoria(){
-	var contenidoBorrar = document.getElementById(categoria.value.name);
+	var contenidoBorrar = this.value;
+	var excepcion = document.getElementById("excepcion");
+	var boolean = false;
 
-    var categoria = new Category(contenidoBorrar,"");
-    video.removeCategory(categoria);
+	var categorias = video.categories;
+	var categoria = categorias.next();
 
-    categoriesMenuPopulate();
+	while((categoria.done !== true) && (!boolean)){
+		if(categoria.value.name == contenidoBorrar){
+			var categoriaBorrar = categoria.value;
+
+			var productions = video.getProductionsCategory(categoria.value);
+			var production = productions.next();
+
+			//Mientras existan producciones...
+			while(production.done !== true){
+				video.deassignCategory(categoriaBorrar, production.value);
+
+				production = productions.next();
+			}
+			encontrado = true;
+		}
+		categoria = categorias.next();
+	}
+
+	try{
+		video.removeCategory(categoriaBorrar);
+		excepcion.innerHTML = "Categoría eliminada con éxito.";
+
+		categoriesMenuPopulate();
+	}catch(error){
+		excepcion.innerHTML = error.message;
+	}
 }
 
 function FormAñadirActor(){
@@ -808,7 +861,6 @@ function FormAñadirActor(){
 	var div = document.createElement("div");
 	div.setAttribute("class", "form-group");
 	var label = document.createElement("label");
-	label.setAttribute("for","nombreA");
 	label.appendChild(document.createTextNode("Nombre"));
 	var input = document.createElement("input");
 	input.setAttribute("type","text");
@@ -821,7 +873,6 @@ function FormAñadirActor(){
 	var div2 = document.createElement("div");
 	div2.setAttribute("class", "form-group");
 	var label2 = document.createElement("label");
-	label2.setAttribute("for","Apellido1A");
 	label2.appendChild(document.createTextNode("Apellido 1"));
 	var input2 = document.createElement("input");
 	input2.setAttribute("type","text");
@@ -834,7 +885,6 @@ function FormAñadirActor(){
 	var div3 = document.createElement("div");
 	div3.setAttribute("class", "form-group");
 	var label3 = document.createElement("label");
-	label3.setAttribute("for","Apellido2A");
 	label3.appendChild(document.createTextNode("Apellido 2"));
 	var input3 = document.createElement("input");
 	input3.setAttribute("type","text");
@@ -844,7 +894,6 @@ function FormAñadirActor(){
 	var div4 = document.createElement("div");
 	div4.setAttribute("class", "form-group");
 	var label4 = document.createElement("label");
-	label4.setAttribute("for","Date");
 	label4.appendChild(document.createTextNode("Fecha de Nacimiento"));
 	var input4 = document.createElement("input");
 	input4.setAttribute("type","date");
@@ -857,7 +906,6 @@ function FormAñadirActor(){
 	var div5 = document.createElement("div");
 	div5.setAttribute("class", "form-group");
 	var label5 = document.createElement("label");
-	label5.setAttribute("for","Imagen");
 	label5.appendChild(document.createTextNode("Imagen"));
 	var input5 = document.createElement("input");
 	input5.setAttribute("type","text");
@@ -865,17 +913,40 @@ function FormAñadirActor(){
 	input5.setAttribute("id","Imagen");
 
 	var div6 = document.createElement("div");
-	div6.setAttribute("class","input-group mb-3");
-	var input6 = document.createElement("input");
-	input6.setAttribute("type","text");
-	input6.setAttribute("class","form-control");
-	input6.setAttribute("placeholder","Seleccione una producción");
-	var div7 = document.createElement("div");
-	div7.setAttribute("class","input-group-append");
-	var span = document.createElement("span");
-	span.setAttribute("class","input-group-text");
-	span.setAttribute("id","SelecProd");
-	span.appendChild(document.createTextNode("Buscar Producción"));
+	var label6 = document.createElement("label");
+	label6.appendChild(document.createTextNode("Producciones"));
+
+	var buscador = document.createElement("input");
+	buscador.setAttribute("class","form-control mb-3");
+	buscador.setAttribute("id","myInput");
+	buscador.setAttribute("type","text");
+	buscador.setAttribute("placeholder","Buscar producción...");
+
+	var ul = document.createElement("ul");
+	ul.setAttribute("class","list-group");
+	ul.setAttribute("id","myList");
+
+	var producciones = video.productions;
+	var produccion = producciones.next();
+
+	while ((produccion.done !== true)){
+		var radio = document.createElement("input");
+		radio.setAttribute("type","radio");
+		radio.setAttribute("class","mr-1");
+		radio.setAttribute("id","prodRadio");
+		radio.setAttribute("name","produccion");
+		radio.setAttribute("value",produccion.value.title);
+
+		var li = document.createElement("li");
+		li.setAttribute("class","list-group-item");
+		
+		li.appendChild(radio);
+		li.appendChild(document.createTextNode(produccion.value.title));
+
+		ul.appendChild(li);
+	
+		produccion = producciones.next();
+	}
 
 	var button = document.createElement("button");
 	button.setAttribute("type","button");
@@ -905,9 +976,9 @@ function FormAñadirActor(){
 	div5.appendChild(label5);
 	div5.appendChild(input5);
 	formulario.appendChild(div6);
-	div6.appendChild(input6);
-	div6.appendChild(div7);
-	div7.appendChild(span);
+	div6.appendChild(label6);
+	div6.appendChild(buscador);
+	div6.appendChild(ul);
 	formulario.appendChild(button);
 }
 
@@ -917,7 +988,7 @@ function AñadirActor(){
 	var apellido2 = document.getElementById("Apellido2A").value;
 	var fecha = document.getElementById("Date");
 	var imagen = document.getElementById("Imagen").value;
-	var prod = document.getElementById("SelecProd").value;
+	var prod = $('input[name=produccion]:checked', '#myForm').val();
 	var errorNombre = document.getElementById("errorNombre");
 	var errorAp1 = document.getElementById("errorAp1");
 	var errorFecha = document.getElementById("errorFecha");
@@ -949,13 +1020,27 @@ function AñadirActor(){
 	}
 
 	if((nombre.value !== "") && (apellido1.value !== "") && (fecha.value !== "")){
-		//Añadimos el actor al sistema
-		var actor = new Person(nombre.value,apellido1.value,apellido2,fecha.value,imagen);
+		var boolean = false;
+		var producciones = video.productions;
+		var produccion = producciones.next();
+		
+		while((produccion.done != true) && (!boolean)){
+			if(produccion.value.title == prod){
+				var prodAñadir = produccion.value;
+				boolean = true;
+			}
+			produccion = producciones.next();
+		}
 
-		//Asignamos el actor a la produccion seleccionada
-		//video.assignActor(actor,prod);
 		try{
+			//Añadimos el actor al sistema
+			var actor = new Person(nombre.value,apellido1.value,apellido2,new Date(fecha.value),imagen);
+
 			video.addActor(actor);
+
+			if(prod != undefined){
+				video.assignActor(actor,prodAñadir);
+			}
 			excepcion.innerHTML = "Actor añadido con éxito.";
 		}catch(error){
 			excepcion.innerHTML = error.message;
@@ -985,16 +1070,28 @@ function FormModificarActor(){
 	var tr = document.createElement("tr");
 	var th = document.createElement("th");
 	th.appendChild(document.createTextNode("Nombre"));
+	th.setAttribute("style","width: 18%;");
+	th.setAttribute("class","text-center");
 	var th1 = document.createElement("th");
 	th1.appendChild(document.createTextNode("Apellido 1"));
+	th1.setAttribute("style","width: 18%;");
+	th1.setAttribute("class","text-center");
 	var th2 = document.createElement("th");
 	th2.appendChild(document.createTextNode("Apellido 2"));
-	//var th3 = document.createElement("th");
-	//th3.appendChild(document.createTextNode("Fecha Nacimiento"));
+	th2.setAttribute("style","width: 18%;");
+	th2.setAttribute("class","text-center");
+	var th3 = document.createElement("th");
+	th3.appendChild(document.createTextNode("Fecha Nacimiento"));
+	th3.setAttribute("style","width: 18%;");
+	th3.setAttribute("class","text-center");
 	var th4 = document.createElement("th");
 	th4.appendChild(document.createTextNode("Imagen"));
+	th4.setAttribute("style","width: 21%;");
+	th4.setAttribute("class","text-center");
 	var th5 = document.createElement("th");
 	th5.appendChild(document.createTextNode(""));
+	th5.setAttribute("style","width: 7%;");
+	th5.setAttribute("class","text-center");
 	var tbody = document.createElement("tbody");
     tbody.setAttribute("id","miTabla");
 
@@ -1005,7 +1102,7 @@ function FormModificarActor(){
 	tr.appendChild(th);
 	tr.appendChild(th1);
 	tr.appendChild(th2);
-	//tr.appendChild(th3);
+	tr.appendChild(th3);
 	tr.appendChild(th4);
 	tr.appendChild(th5);
 	tabla.appendChild(tbody);
@@ -1019,49 +1116,48 @@ function FormModificarActor(){
 		var inputNombre = document.createElement("input");
 		inputNombre.setAttribute("class","form-control");
 		inputNombre.setAttribute("type","text");
-		inputNombre.setAttribute("id","inputNombre");
+		inputNombre.setAttribute("id","inputNombre" + actor.value.lastname1);
 		inputNombre.setAttribute("value",actor.value.name);
 
 		var tdAp1 = document.createElement("td");
 		var inputAp1 = document.createElement("input");
 		inputAp1.setAttribute("class","form-control");
 		inputAp1.setAttribute("type","text");
-		inputAp1.setAttribute("id","inputAp1");
+		inputAp1.setAttribute("id","inputAp1" + actor.value.lastname1);
 		inputAp1.setAttribute("value",actor.value.lastname1);
 
 		var tdAp2 = document.createElement("td");
 		var inputAp2 = document.createElement("input");
 		inputAp2.setAttribute("class","form-control");
 		inputAp2.setAttribute("type","text");
-		inputAp2.setAttribute("id","inputAp2");
+		inputAp2.setAttribute("id","inputAp2" + actor.value.lastname1);
 		inputAp2.setAttribute("value",actor.value.lastname2);
 
-		/*var tdFecha = document.createElement("td");
+		var tdFecha = document.createElement("td");
 		var inputFecha = document.createElement("input");
 		inputFecha.setAttribute("class","form-control");
-		inputFecha.setAttribute("type","date");
-		inputFecha.setAttribute("id","inputFecha");
-		inputFecha.setAttribute("size","2");
-		inputFecha.setAttribute("value",actor.value.born.toLocaleDateString());*/
+		inputFecha.setAttribute("type","text");
+		inputFecha.setAttribute("id","inputFecha" + actor.value.lastname1);
+		inputFecha.setAttribute("value",actor.value.born.toLocaleDateString());
 
 		var tdImg = document.createElement("td");
 		var inputImg = document.createElement("input");
 		inputImg.setAttribute("class","form-control");
 		inputImg.setAttribute("type","text");
-		inputImg.setAttribute("id","inputImg");
+		inputImg.setAttribute("id","inputImg" + actor.value.lastname1);
+		inputImg.setAttribute("value",actor.value.picture);
 			
 		var tdBoton = document.createElement("td");
 		var button = document.createElement("button");
 		button.setAttribute("type","button");
 		button.setAttribute("class","btn botonBorrar p-0");
-		button.setAttribute("value",actor.value.name + " " + actor.value.lastname1);
-		//button.addEventListener("click", ModificarActor);
+		button.setAttribute("value",actor.value.lastname1);
+		button.addEventListener("click", ModificarActor);
 
 		var img = document.createElement("img");
 		img.setAttribute("class","img-fluid");
 		img.setAttribute("src","img/modificar.png");
 		img.setAttribute("alt",actor.value.name + " " + actor.value.lastname1);
-		//img.setAttribute("style","width: 25px;");
 
 		tbody.appendChild(tr);
 		tr.appendChild(tdNombre);
@@ -1070,8 +1166,8 @@ function FormModificarActor(){
 		tdAp1.appendChild(inputAp1);
 		tr.appendChild(tdAp2);
 		tdAp2.appendChild(inputAp2);
-		//tr.appendChild(tdFecha);
-		//tdFecha.appendChild(inputFecha);
+		tr.appendChild(tdFecha);
+		tdFecha.appendChild(inputFecha);
 		tr.appendChild(tdImg);
 		tdImg.appendChild(inputImg);
 		tr.appendChild(tdBoton);
@@ -1083,7 +1179,32 @@ function FormModificarActor(){
 }
 
 function ModificarActor(){
+	var ApActorMod = this.value;
+	var nombre = document.getElementById("inputNombre" + this.value).value;
+	var apellido1 = document.getElementById("inputAp1" + this.value).value;
+	var apellido2 = document.getElementById("inputAp2" + this.value).value;
+	var fecha = document.getElementById("inputFecha" + this.value).value;
+	var imagen = document.getElementById("inputImg" + this.value).value;
+	
+	//Creamos un array donde separamos la fecha por el simbolo seleccionado
+	var arrayFecha = fecha.split("/");
 
+	var boolean = false;
+	var actores = video.actors;
+	var actor = actores.next();
+
+	while((actor.done != true) && (!boolean)){
+		if(actor.value.lastname1 == ApActorMod){
+			actor.value.name = nombre;
+			actor.value.lastname1 = apellido1;
+			actor.value.lastname2 = apellido2;
+			actor.value.born = new Date(arrayFecha[2],arrayFecha[1],arrayFecha[0]);
+			actor.value.picture = imagen;
+
+			boolean = true;
+		}
+		actor = actores.next();
+	}
 }
 
 function FormEliminarActor(){
@@ -1102,6 +1223,9 @@ function FormEliminarActor(){
 
 	var formulario = document.createElement("form");
 	formulario.setAttribute("id","formulario");
+	var p = document.createElement("p");
+	p.setAttribute("id","excepcion");
+	p.setAttribute("class","text-center font-weight-bold");
 	var tabla = document.createElement("table");
 	tabla.setAttribute("class","table table-bordered table-hover");
 	var thead = document.createElement("thead");
@@ -1116,6 +1240,7 @@ function FormEliminarActor(){
     tbody.setAttribute("id","miTabla");
 
 	contenido.appendChild(formulario);
+	formulario.appendChild(p);
 	formulario.appendChild(tabla);
 	tabla.appendChild(thead);
 	tabla.appendChild(tr);
@@ -1136,11 +1261,13 @@ function FormEliminarActor(){
 		var tdApellido1 = document.createElement("td");
 		tdApellido1.appendChild(document.createTextNode(actor.value.lastname1));
 		var td = document.createElement("td");
+		td.setAttribute("id","botonesEliminar" + actor.value.lastname1);
+		td.setAttribute("style","width:30%;");
 		var button = document.createElement("button");
 		button.setAttribute("type","button");
 		button.setAttribute("class","btn botonBorrar p-0");
-		button.setAttribute("value",actor.value.name + " " + actor.value.lastname1);
-		//button.addEventListener("click", EliminarCategoria);
+		button.setAttribute("value",actor.value.lastname1);
+		button.addEventListener("click", BotonesEliminar);
 
 		var img = document.createElement("img");
 		img.setAttribute("class","img-fluid");
@@ -1160,7 +1287,36 @@ function FormEliminarActor(){
 }
 
 function EliminarActor(){
-	
+	var contenidoBorrar = this.value;
+	var excepcion = document.getElementById("excepcion");
+	var boolean = false;
+
+	var actores = video.actors;
+	var actor = actores.next();
+
+	while((actor.done !== true) && (!boolean)){
+		if(actor.value.lastname1 == contenidoBorrar){
+			var actorBorrar = actor.value;
+
+			var productions = video.getProductionsActor(actor.value);
+			var production = productions.next();
+
+			while(production.done != true){
+				video.deassignActor(actorBorrar,production.value);
+
+				production = productions.next();
+			}
+			encontrado = true;
+		}
+		actor = actores.next();
+	}
+
+	try{
+		video.removeActor(actorBorrar);
+		excepcion.innerHTML = "Actor eliminado con éxito.";
+	}catch(error){
+		excepcion.innerHTML = error.message;
+	}
 }
 
 function FormAñadirDirector(){
@@ -1241,17 +1397,40 @@ function FormAñadirDirector(){
 	input5.setAttribute("id","ImagenD");
 
 	var div6 = document.createElement("div");
-	div6.setAttribute("class","input-group mb-3");
-	var input6 = document.createElement("input");
-	input6.setAttribute("type","text");
-	input6.setAttribute("class","form-control");
-	input6.setAttribute("placeholder","Seleccione una producción");
-	var div7 = document.createElement("div");
-	div7.setAttribute("class","input-group-append");
-	var span = document.createElement("span");
-	span.setAttribute("class","input-group-text");
-	span.setAttribute("id","SelecProd");
-	span.appendChild(document.createTextNode("Buscar Producción"));
+	var label6 = document.createElement("label");
+	label6.appendChild(document.createTextNode("Producciones"));
+
+	var buscador = document.createElement("input");
+	buscador.setAttribute("class","form-control mb-3");
+	buscador.setAttribute("id","myInput");
+	buscador.setAttribute("type","text");
+	buscador.setAttribute("placeholder","Buscar producción...");
+
+	var ul = document.createElement("ul");
+	ul.setAttribute("class","list-group");
+	ul.setAttribute("id","myList");
+
+	var producciones = video.productions;
+	var produccion = producciones.next();
+
+	while ((produccion.done !== true)){
+		var radio = document.createElement("input");
+		radio.setAttribute("type","radio");
+		radio.setAttribute("class","mr-1");
+		radio.setAttribute("id","prodRadio");
+		radio.setAttribute("name","produccion");
+		radio.setAttribute("value",produccion.value.title);
+
+		var li = document.createElement("li");
+		li.setAttribute("class","list-group-item");
+		
+		li.appendChild(radio);
+		li.appendChild(document.createTextNode(produccion.value.title));
+
+		ul.appendChild(li);
+	
+		produccion = producciones.next();
+	}
 
 	var button = document.createElement("button");
 	button.setAttribute("type","button");
@@ -1281,10 +1460,19 @@ function FormAñadirDirector(){
 	div5.appendChild(label5);
 	div5.appendChild(input5);
 	formulario.appendChild(div6);
-	div6.appendChild(input6);
-	div6.appendChild(div7);
-	div7.appendChild(span);
+	div6.appendChild(label6);
+	div6.appendChild(buscador);
+	div6.appendChild(ul);
 	formulario.appendChild(button);
+
+	$(document).ready(function(){
+        $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myList li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
 }
 
 function AñadirDirector(){
@@ -1293,7 +1481,7 @@ function AñadirDirector(){
 	var apellido2 = document.getElementById("Apellido2D").value;
 	var fecha = document.getElementById("DateD");
 	var imagen = document.getElementById("ImagenD").value;
-	var prod = document.getElementById("SelecProd").value;
+	var prod = $('input[name=produccion]:checked', '#myForm').val();
 	var errorNombre = document.getElementById("errorNombre");
 	var errorAp1 = document.getElementById("errorAp1");
 	var errorFecha = document.getElementById("errorFecha");
@@ -1325,13 +1513,27 @@ function AñadirDirector(){
 	}
 
 	if((nombre.value !== "") && (apellido1.value !== "") && (fecha.value !== "")){
-		//Añadimos el director al sistema
-		var director = new Person(nombre.value,apellido1.value,apellido2,fecha.value,imagen);
+		var boolean = false;
+		var producciones = video.productions;
+		var produccion = producciones.next();
+		
+		while((produccion.done != true) && (!boolean)){
+			if(produccion.value.title == prod){
+				var prodAñadir = produccion.value;
+				boolean = true;
+			}
+			produccion = producciones.next();
+		}
 
-		//Asignamos el director a la produccion seleccionada
-		//video.assignDirector(director,prod);
 		try{
+			//Añadimos el director al sistema
+			var director = new Person(nombre.value,apellido1.value,apellido2,new Date(fecha.value),imagen);
+
 			video.addDirector(director);
+
+			if(prod != undefined){
+				video.assignDirector(director,prodAñadir);
+			}
 			excepcion.innerHTML = "Director añadido con éxito.";
 		}catch(error){
 			excepcion.innerHTML = error.message;
@@ -1361,16 +1563,27 @@ function FormModificarDirector(){
 	var tr = document.createElement("tr");
 	var th = document.createElement("th");
 	th.appendChild(document.createTextNode("Nombre"));
+	th.setAttribute("style","width: 18%;");
+	th.setAttribute("class","text-center");
 	var th1 = document.createElement("th");
 	th1.appendChild(document.createTextNode("Apellido 1"));
+	th1.setAttribute("style","width: 18%;");
+	th1.setAttribute("class","text-center");
 	var th2 = document.createElement("th");
 	th2.appendChild(document.createTextNode("Apellido 2"));
+	th2.setAttribute("style","width: 18%;");
+	th2.setAttribute("class","text-center");
 	var th3 = document.createElement("th");
 	th3.appendChild(document.createTextNode("Fecha Nacimiento"));
+	th3.setAttribute("style","width: 18%;");
+	th3.setAttribute("class","text-center");
 	var th4 = document.createElement("th");
 	th4.appendChild(document.createTextNode("Imagen"));
+	th4.setAttribute("style","width: 21%;");
+	th4.setAttribute("class","text-center");
 	var th5 = document.createElement("th");
 	th5.appendChild(document.createTextNode(""));
+	th5.setAttribute("style","width: 7%;");
 	var tbody = document.createElement("tbody");
     tbody.setAttribute("id","miTabla");
 
@@ -1395,49 +1608,48 @@ function FormModificarDirector(){
 		var inputNombre = document.createElement("input");
 		inputNombre.setAttribute("class","form-control");
 		inputNombre.setAttribute("type","text");
-		inputNombre.setAttribute("id","inputNombre");
+		inputNombre.setAttribute("id","inputNombre" + director.value.lastname1);
 		inputNombre.setAttribute("value",director.value.name);
 
 		var tdAp1 = document.createElement("td");
 		var inputAp1 = document.createElement("input");
 		inputAp1.setAttribute("class","form-control");
 		inputAp1.setAttribute("type","text");
-		inputAp1.setAttribute("id","inputAp1");
+		inputAp1.setAttribute("id","inputAp1" + director.value.lastname1);
 		inputAp1.setAttribute("value",director.value.lastname1);
 
 		var tdAp2 = document.createElement("td");
 		var inputAp2 = document.createElement("input");
 		inputAp2.setAttribute("class","form-control");
 		inputAp2.setAttribute("type","text");
-		inputAp2.setAttribute("id","inputAp2");
+		inputAp2.setAttribute("id","inputAp2" + director.value.lastname1);
 		inputAp2.setAttribute("value",director.value.lastname2);
 
 		var tdFecha = document.createElement("td");
 		var inputFecha = document.createElement("input");
 		inputFecha.setAttribute("class","form-control");
-		inputFecha.setAttribute("type","date");
-		inputFecha.setAttribute("id","inputFecha");
-		inputFecha.setAttribute("size","2");
+		inputFecha.setAttribute("type","text");
+		inputFecha.setAttribute("id","inputFecha" + director.value.lastname1);
 		inputFecha.setAttribute("value",director.value.born.toLocaleDateString());
 
 		var tdImg = document.createElement("td");
 		var inputImg = document.createElement("input");
 		inputImg.setAttribute("class","form-control");
 		inputImg.setAttribute("type","text");
-		inputImg.setAttribute("id","inputImg");
+		inputImg.setAttribute("id","inputImg" + director.value.lastname1);
+		inputImg.setAttribute("value",director.value.picture);
 			
 		var tdBoton = document.createElement("td");
 		var button = document.createElement("button");
 		button.setAttribute("type","button");
 		button.setAttribute("class","btn botonBorrar p-0");
-		button.setAttribute("value",director.value.name + " " + director.value.lastname1);
-		//button.addEventListener("click", ModificarDirector);
+		button.setAttribute("value",director.value.lastname1);
+		button.addEventListener("click", ModificarDirector);
 
 		var img = document.createElement("img");
 		img.setAttribute("class","img-fluid");
 		img.setAttribute("src","img/modificar.png");
 		img.setAttribute("alt",director.value.name + " " + director.value.lastname1);
-		//img.setAttribute("style","width: 25px;");
 
 		tbody.appendChild(tr);
 		tr.appendChild(tdNombre);
@@ -1459,7 +1671,32 @@ function FormModificarDirector(){
 }
 
 function ModificarDirector(){
+	var ApDirectorMod = this.value;
+	var nombre = document.getElementById("inputNombre" + this.value).value;
+	var apellido1 = document.getElementById("inputAp1" + this.value).value;
+	var apellido2 = document.getElementById("inputAp2" + this.value).value;
+	var fecha = document.getElementById("inputFecha" + this.value).value;
+	var imagen = document.getElementById("inputImg" + this.value).value;
 
+	//Creamos un array donde separamos la fecha por el simbolo seleccionado
+	var arrayFecha = fecha.split("/");
+
+	var boolean = false;
+	var directores = video.directors;
+	var director = directores.next();
+
+	while((director.done != true) && (!boolean)){
+		if(director.value.lastname1 == ApDirectorMod){
+			director.value.name = nombre;
+			director.value.lastname1 = apellido1;
+			director.value.lastname2 = apellido2;
+			director.value.born = new Date(arrayFecha[2],arrayFecha[1],arrayFecha[0]);
+			director.value.picture = imagen;
+
+			boolean = true;
+		}
+		director = directores.next();
+	}
 }
 
 function FormEliminarDirector(){
@@ -1478,6 +1715,9 @@ function FormEliminarDirector(){
 
 	var formulario = document.createElement("form");
 	formulario.setAttribute("id","formulario");
+	var p = document.createElement("p");
+	p.setAttribute("id","excepcion");
+	p.setAttribute("class","text-center font-weight-bold");
 	var tabla = document.createElement("table");
 	tabla.setAttribute("class","table table-bordered table-hover");
 	var thead = document.createElement("thead");
@@ -1492,6 +1732,7 @@ function FormEliminarDirector(){
     tbody.setAttribute("id","miTabla");
 
 	contenido.appendChild(formulario);
+	formulario.appendChild(p);
 	formulario.appendChild(tabla);
 	tabla.appendChild(thead);
 	tabla.appendChild(tr);
@@ -1512,11 +1753,13 @@ function FormEliminarDirector(){
 		var tdApellido1 = document.createElement("td");
 		tdApellido1.appendChild(document.createTextNode(director.value.lastname1));
 		var td = document.createElement("td");
+		td.setAttribute("id","botonesEliminar" + director.value.lastname1);
+		td.setAttribute("style","width:30%;");
 		var button = document.createElement("button");
 		button.setAttribute("type","button");
 		button.setAttribute("class","btn botonBorrar p-0");
-		button.setAttribute("value",director.value.name + " " + director.value.lastname1);
-		//button.addEventListener("click", EliminarDirector);
+		button.setAttribute("value",director.value.lastname1);
+		button.addEventListener("click", BotonesEliminar);
 
 		var img = document.createElement("img");
 		img.setAttribute("class","img-fluid");
@@ -1536,7 +1779,36 @@ function FormEliminarDirector(){
 }
 
 function EliminarDirector(){
-	
+	var contenidoBorrar = this.value;
+	var excepcion = document.getElementById("excepcion");
+	var boolean = false;
+
+	var directores = video.directors;
+	var director = directores.next();
+
+	while((director.done !== true) && (!boolean)){
+		if(director.value.lastname1 == contenidoBorrar){
+			var directorBorrar = director.value;
+
+			var productions = video.getProductionsDirector(director.value);
+			var production = productions.next();
+
+			while(production.done != true){
+				video.deassignDirector(directorBorrar,production.value);
+
+				production = productions.next();
+			}
+			encontrado = true;
+		}
+		director = directores.next();
+	}
+
+	try{
+		video.removeDirector(directorBorrar);
+		excepcion.innerHTML = "Director eliminado con éxito.";
+	}catch(error){
+		excepcion.innerHTML = error.message;
+	}
 }
 
 function FormAñadirProd(){
@@ -1554,6 +1826,8 @@ function FormAñadirProd(){
 
 	var formulario = document.createElement("form");
 	formulario.setAttribute("id","formulario");
+	var divBotones = document.createElement("div");
+	divBotones.setAttribute("class","d-flex justify-content-center");
 	var p = document.createElement("p");
 	p.setAttribute("id","excepcion");
 	p.setAttribute("class","text-center font-weight-bold");
@@ -1609,26 +1883,138 @@ function FormAñadirProd(){
 	input5.setAttribute("id","Imagen");
 
 	var div6 = document.createElement("div");
-	div6.setAttribute("class","input-group mb-3");
-	var input6 = document.createElement("input");
-	input6.setAttribute("type","text");
-	input6.setAttribute("class","form-control");
-	input6.setAttribute("placeholder","Seleccione una producción");
-	var div7 = document.createElement("div");
-	div7.setAttribute("class","input-group-append");
-	var span = document.createElement("span");
-	span.setAttribute("class","input-group-text");
-	span.setAttribute("id","SelecProd");
-	span.appendChild(document.createTextNode("Buscar Producción"));
+	var label6 = document.createElement("label");
+	label6.appendChild(document.createTextNode("Categorías"));
 
-	var button = document.createElement("button");
-	button.setAttribute("type","button");
-	button.setAttribute("class","btn");
-	button.setAttribute("id","botonAC");
-	button.appendChild(document.createTextNode("Añadir"));
-	button.addEventListener("click", AñadirProd);
+	var buscadorCat = document.createElement("input");
+	buscadorCat.setAttribute("class","form-control mb-2");
+	buscadorCat.setAttribute("id","inputCat");
+	buscadorCat.setAttribute("type","text");
+	buscadorCat.setAttribute("placeholder","Buscar Categoría...");
+
+	var ulCat = document.createElement("ul");
+	ulCat.setAttribute("class","list-group");
+	ulCat.setAttribute("id","ListaCat");
+
+	var categorias = video.categories;
+	var categoria = categorias.next();
+
+	while ((categoria.done !== true)){
+		var radioCat = document.createElement("input");
+		radioCat.setAttribute("type","checkbox");
+		radioCat.setAttribute("class","mr-1 categoriaBox");
+		radioCat.setAttribute("name",categoria.value.name);
+		radioCat.setAttribute("value",categoria.value.name);
+
+		var liCat = document.createElement("li");
+		liCat.setAttribute("class","list-group-item");
+		
+		liCat.appendChild(radioCat);
+		liCat.appendChild(document.createTextNode(categoria.value.name));
+		ulCat.appendChild(liCat);
+	
+		categoria = categorias.next();
+	}
+
+	var div7 = document.createElement("div");
+	div7.setAttribute("class","d-flex");
+
+	var divActores = document.createElement("div");
+	divActores.setAttribute("class","mt-3");
+	divActores.setAttribute("style","width: 45%");
+	var labelActores = document.createElement("label");
+	labelActores.appendChild(document.createTextNode("Actores"));
+
+	var buscadorAct = document.createElement("input");
+	buscadorAct.setAttribute("class","form-control mb-2");
+	buscadorAct.setAttribute("id","inputAct");
+	buscadorAct.setAttribute("type","text");
+	buscadorAct.setAttribute("placeholder","Buscar Actores...");
+
+	var ulAct = document.createElement("ul");
+	ulAct.setAttribute("class","list-group");
+	ulAct.setAttribute("id","ListAct");
+
+	var actores = video.actors;
+	var actor = actores.next();
+
+	while ((actor.done !== true)){
+		var radioAct = document.createElement("input");
+		radioAct.setAttribute("type","checkbox");
+		radioAct.setAttribute("class", "mr-1 actorBox");
+		radioAct.setAttribute("name",actor.value.name);
+		radioAct.setAttribute("value",actor.value.name);
+
+		var liAct = document.createElement("li");
+		liAct.setAttribute("class","list-group-item");
+		
+		liAct.appendChild(radioAct);
+		liAct.appendChild(document.createTextNode(actor.value.name + " " + actor.value.lastname1));
+		ulAct.appendChild(liAct);
+	
+		actor = actores.next();
+	}
+
+	var divDirectores = document.createElement("div");
+	divDirectores.setAttribute("class","ml-5 mt-3");
+	divDirectores.setAttribute("style","width: 45%");
+	var labelDirectores = document.createElement("label");
+	labelDirectores.appendChild(document.createTextNode("Directores"));
+
+	var buscadorDir = document.createElement("input");
+	buscadorDir.setAttribute("class","form-control mb-2");
+	buscadorDir.setAttribute("id","inputDir");
+	buscadorDir.setAttribute("type","text");
+	buscadorDir.setAttribute("placeholder","Buscar Directores...");
+
+	var ulDir = document.createElement("ul");
+	ulDir.setAttribute("class","list-group");
+	ulDir.setAttribute("id","ListDir");
+
+	var directores = video.directors;
+	var director = directores.next();
+
+	while ((director.done !== true)){
+		var radioDir = document.createElement("input");
+		radioDir.setAttribute("type","checkbox");
+		radioDir.setAttribute("class","mr-1 directorBox");
+		radioDir.setAttribute("name",director.value.name);
+		radioDir.setAttribute("value",director.value.name);
+
+		var liDir = document.createElement("li");
+		liDir.setAttribute("class","list-group-item");
+		
+		liDir.appendChild(radioDir);
+		liDir.appendChild(document.createTextNode(director.value.name + " " + director.value.lastname1));
+		ulDir.appendChild(liDir);
+	
+		director = directores.next();
+	}
+
+	var div8 = document.createElement("div");
+	div8.setAttribute("id","contenidoSeriesPeliculas");
+
+	var div9 = document.createElement("div");
+	div9.setAttribute("id","cuerpoBoton");
+
+	var botonSeries = document.createElement("button");
+	botonSeries.setAttribute("type","button");
+	botonSeries.setAttribute("class","btn BotonSeriePelicula");
+	botonSeries.setAttribute("value","series");
+	botonSeries.appendChild(document.createTextNode("Series"));
+	botonSeries.addEventListener("click",AñadirProd);
+
+	var botonPeliculas = document.createElement("button");
+	botonPeliculas.setAttribute("type","button");
+	botonPeliculas.setAttribute("class","btn BotonSeriePelicula");
+	botonPeliculas.setAttribute("value","peliculas");
+	botonPeliculas.appendChild(document.createTextNode("Peliculas"));
+	botonPeliculas.addEventListener("click",AñadirProd);
 
 	contenido.appendChild(formulario);
+	formulario.appendChild(divBotones);
+	divBotones.appendChild(botonSeries);
+	divBotones.appendChild(botonPeliculas);
 	formulario.appendChild(p);
 	formulario.appendChild(div);
 	div.appendChild(label);
@@ -1648,14 +2034,505 @@ function FormAñadirProd(){
 	div5.appendChild(label5);
 	div5.appendChild(input5);
 	formulario.appendChild(div6);
-	div6.appendChild(input6);
-	div6.appendChild(div7);
-	div7.appendChild(span);
-	formulario.appendChild(button);
+	div6.appendChild(label6);
+	div6.appendChild(buscadorCat);
+	div6.appendChild(ulCat);
+	formulario.appendChild(div7);
+	div7.appendChild(divActores);
+	divActores.appendChild(labelActores);
+	divActores.appendChild(buscadorAct);
+	divActores.appendChild(ulAct);
+	div7.appendChild(divDirectores);
+	divDirectores.appendChild(labelDirectores);
+	divDirectores.appendChild(buscadorDir);
+	divDirectores.appendChild(ulDir);
+	formulario.appendChild(div8);
+	formulario.appendChild(div9);
+
+    $(document).ready(function(){
+        $("#inputCat").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#ListaCat li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+    $(document).ready(function(){
+        $("#inputAct").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#ListAct li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+    $(document).ready(function(){
+        $("#inputDir").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#ListDir li").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
 }
 
 function AñadirProd(){
+	var video = VideoSystem.getInstance();
+	var arrayRecursos = video.resources;
+	var arraySeason = video.seasons;
 
+	var produccion = this.value;
+	var añadirCont = document.getElementById("contenidoSeriesPeliculas");
+	var cuerpo = document.getElementById("cuerpoBoton");
+
+	while (cuerpo.firstChild) {
+		cuerpo.removeChild(cuerpo.firstChild);
+	}
+
+	while (añadirCont.firstChild){
+        añadirCont.removeChild(añadirCont.firstChild);
+	}
+	
+	//Boton Añadir
+	var button = document.createElement("button");
+	button.setAttribute("type","button");
+	button.setAttribute("class","btn");
+	button.setAttribute("id","botonAC");
+	button.appendChild(document.createTextNode("Añadir"));
+
+	if(produccion == "series"){
+		button.addEventListener("click", AñadirSerie);
+
+		var labelTemp = document.createElement("label");
+		labelTemp.setAttribute("class","mt-3");
+		labelTemp.appendChild(document.createTextNode("Temporadas"));
+
+		var ul = document.createElement("ul");
+		ul.setAttribute("class","list-group");
+		
+		añadirCont.appendChild(labelTemp);
+		añadirCont.appendChild(ul);
+
+		//console.log(arraySeason);
+
+		for(var i = 0; i < arraySeason.length; i++){
+            var radio = document.createElement("input");
+            radio.setAttribute("type","radio");
+            radio.setAttribute("class","mr-1");
+            radio.setAttribute("id","produccionRadio");
+            radio.setAttribute("name","season");
+            radio.setAttribute("value",arraySeason[i].title);
+
+            var li = document.createElement("li");
+            li.setAttribute("class","list-group-item");
+            
+            li.appendChild(radio);
+
+            var pT = document.createElement("span");
+            pT.appendChild(document.createTextNode(arraySeason[i].title));
+
+            li.appendChild(pT);
+          
+            for(var y = 0; y < arraySeason[i].episodes.length; y++){
+                var pE = document.createElement("p");
+                pE.setAttribute("class","m-0 font-weight-light");
+                pE.appendChild(document.createTextNode(arraySeason[i].episodes[y].title));
+
+                var pReCu = document.createElement("p");
+                pReCu.setAttribute("class","m-0 ml-3");
+                pReCu.appendChild(document.createTextNode("Recurso: " + arraySeason[i].episodes[y].episode.duration + " duración"));
+                
+                li.appendChild(pE);
+                li.appendChild(pReCu);
+
+                if(arraySeason[i].episodes[y].episode.audios != ""){
+                    var pRecuAu = document.createElement("p");
+                    pRecuAu.setAttribute("class","m-0 ml-5");
+                    pRecuAu.appendChild(document.createTextNode("Audios: " + arraySeason[i].episodes[y].episode.audios));
+                    
+                    li.appendChild(pRecuAu);
+                }
+
+                if(arraySeason[i].episodes[y].episode.subtitles != ""){
+                    var pRecuSub = document.createElement("p");
+                    pRecuSub.setAttribute("class","m-0 ml-5");
+                    pRecuSub.appendChild(document.createTextNode("Subtitulos : " + arraySeason[i].episodes[y].episode.subtitles));
+                
+                    li.appendChild(pRecuSub);
+                }
+
+                for(var z = 0; z < arraySeason[i].episodes[y].scenarios.length; z++){
+                    var pL = document.createElement("p");
+                    pL.setAttribute("class","m-0 ml-3");
+                    pL.appendChild(document.createTextNode("Localización : " + arraySeason[i].episodes[y].scenarios[z]));
+                    
+                    li.appendChild(pL);
+                }
+            }
+
+            ul.appendChild(li);   
+        }
+	}
+	else{
+		button.addEventListener("click", AñadirPelicula);
+
+        var labelLocations = document.createElement("label");
+        labelLocations.setAttribute("for","locations");
+        labelLocations.appendChild(document.createTextNode("Localización"));
+
+        var inputLoca = document.createElement("input");
+        inputLoca.setAttribute("type","text");
+        inputLoca.setAttribute("id","locations");
+        inputLoca.setAttribute("class","form-control");
+
+        var pRecursos = document.createElement("p");
+        pRecursos.setAttribute("class","m-0 mt-3 mb-2");
+		pRecursos.appendChild(document.createTextNode("Recursos"));
+		
+		var pRecursosError = document.createElement("p");
+        pRecursosError.setAttribute("id","errorRecursos");
+        pRecursosError.setAttribute("class","error");
+        
+        var ul = document.createElement("ul");
+        ul.setAttribute("class","list-group");
+
+        formulario.appendChild(labelLocations);
+        formulario.appendChild(inputLoca);
+		formulario.appendChild(pRecursos);
+		formulario.appendChild(pRecursosError);
+        formulario.appendChild(ul);
+
+        for(var i = 0; i < arrayRecursos.length; i++){
+            var radio = document.createElement("input");
+            radio.setAttribute("type","radio");
+            radio.setAttribute("class","mr-1");
+            radio.setAttribute("id","produccionRadio");
+            radio.setAttribute("name","produccion");
+            radio.setAttribute("value",arrayRecursos[i].duration);
+
+            var li = document.createElement("li");
+            li.setAttribute("class","list-group-item");
+            
+            li.appendChild(radio);
+
+            var pD = document.createElement("span");
+            pD.appendChild(document.createTextNode("Duración: " + arrayRecursos[i].duration));
+
+            var pA = document.createElement("p");
+            pA.setAttribute("class","m-0");
+            pA.appendChild(document.createTextNode("Audios: " + arrayRecursos[i].audios));
+
+            var pS = document.createElement("p");
+            pS.setAttribute("class","m-0");
+            pS.appendChild(document.createTextNode("Subtitulos: " + arrayRecursos[i].subtitles));
+
+            li.appendChild(pD);
+            li.appendChild(pA);
+            li.appendChild(pS);
+
+            ul.appendChild(li);
+		}
+	}
+	cuerpo.appendChild(button);
+}
+
+function AñadirSerie(){
+	var excepcion = document.getElementById("excepcion");
+    var titulo = document.getElementById("titulo");
+    var publicacion = document.getElementById("Date");
+    var errorTitulo = document.getElementById("errorTitulo");
+    var errorPubli = document.getElementById("errorFecha");
+    
+    var nacionalidad = document.getElementById("nacionalidad").value;
+    var synopsis = document.getElementById("synopsis").value;
+    var imagen = document.getElementById("Imagen").value;
+
+	var video = VideoSystem.getInstance();
+	var arraySeason = video.seasons;
+
+    var arrayCategorias = [];
+    var arrayActores = [];
+    var arrayDirectores = [];
+
+    $('.categoriaBox:checked').each(
+        function() {
+            arrayCategorias.push($(this).val());
+        }
+    );
+
+    $('.actorBox:checked').each(
+        function() {
+            arrayActores.push($(this).val());
+        }
+    );
+
+    $('.directorBox:checked').each(
+        function() {
+            arrayDirectores.push($(this).val());
+        }
+    );
+
+    var radioSeason = $('input[name=season]:checked', '#formulario').val();
+
+    if(titulo.value == ""){
+        titulo.setAttribute("style","border-color: red");
+        errorTitulo.innerHTML = "El campo título es obligatorio";
+    }else{
+        titulo.removeAttribute("style");
+        errorTitulo.innerHTML = "";
+    }
+
+    if(publicacion.value == ""){
+        publicacion.setAttribute("style","border-color: red");
+        errorPubli.innerHTML = "El campo publicación es obligatorio";
+    }else{
+        publicacion.removeAttribute("style");
+        errorPubli.innerHTML = "";
+    }
+
+    if((titulo.value != "") && (publicacion.value  != "")){
+
+        var arrayCategoriasAsociar = [];
+
+        for(var i = 0; i < arrayCategorias.length; i++){
+            var boolean = false;
+            var categorias = video.categories;
+            var categoria = categorias.next();
+
+            while ((categoria.done !== true) && (!boolean)){
+                if (categoria.value.name == arrayCategorias[i]) {
+
+                    arrayCategoriasAsociar.push(categoria.value);
+
+                    boolean = true;
+                }
+                categoria = categorias.next();
+            }
+        }
+
+        var arrayActorAsociar = [];
+
+        for(var i = 0; i < arrayActores.length; i++){
+            var boolean = false;
+            var actores = video.actors;
+            var actor = actores.next();
+
+            while ((actor.done !== true) && (!boolean)){
+                if (actor.value.name == arrayActores[i]) {
+
+                    arrayActorAsociar.push(actor.value);
+            
+                    boolean = true;
+                }
+                actor = actores.next();
+            }
+        }
+
+        var arrayDirectorAsociar = [];
+
+        for(var i = 0; i < arrayDirectores.length; i++){
+            var boolean = false;
+            var directores = video.directors;
+            var director = directores.next();
+
+            while ((director.done !== true) && (!boolean)){
+                if (director.value.name == arrayDirectores[i]) {
+
+                    arrayDirectorAsociar.push(director.value);
+            
+                    boolean = true;
+                }
+                director = directores.next();
+            }
+        }
+
+        var arraySeasonAsignar = []; 
+
+        if(radioSeason != undefined){
+            for(var i = 0; i < arraySeason.length; i++){
+                if(radioSeason == arraySeason[i].title){
+                    var season = arraySeason[i];
+                }
+            }
+            
+            arraySeasonAsignar.push(season);
+        }
+
+        try{
+            var serie = new Serie(titulo.value,nacionalidad,new Date(publicacion.value),synopsis,imagen,arraySeasonAsignar);
+
+            video.addProduction(serie);
+
+            for(let i = 0; i < arrayCategoriasAsociar.length; i++){
+                video.assignCategory(arrayCategoriasAsociar[i],serie);
+            }
+
+            for(let i = 0; i < arrayActorAsociar.length; i++){
+                video.assignActor(arrayActorAsociar[i],serie);
+            }
+
+            for(let i = 0; i < arrayDirectorAsociar.length; i++){
+                video.assignDirector(arrayDirectorAsociar[i],serie);
+            }
+
+            excepcion.innerHTML = "Serie añadida con éxito.";
+        }catch(error){
+            excepcion.innerHTML = error.message;
+        }
+
+    }
+}
+
+function AñadirPelicula(){
+    var excepcion = document.getElementById("excepcion");
+    var titulo = document.getElementById("titulo");
+    var publicacion = document.getElementById("Date");
+    var errorTitulo = document.getElementById("errorTitulo");
+    var errorPubli = document.getElementById("errorFecha");
+    
+    var nacionalidad = document.getElementById("nacionalidad").value;
+    var synopsis = document.getElementById("synopsis").value;
+    var imagen = document.getElementById("Imagen").value;
+
+	var video = VideoSystem.getInstance();
+	var arrayRecursos = video.resources;
+
+    var arrayCategorias = [];
+    var arrayActores = [];
+    var arrayDirectores = [];
+
+    $('.categoriaBox:checked').each(
+        function() {
+            arrayCategorias.push($(this).val());
+        }
+    );
+
+    $('.actorBox:checked').each(
+        function() {
+            arrayActores.push($(this).val());
+        }
+    );
+
+    $('.directorBox:checked').each(
+        function() {
+            arrayDirectores.push($(this).val());
+        }
+    );
+
+    var localizacion = document.getElementById("locations").value;
+    var arrayLoca = localizacion.split(",");
+
+    var radioRecurso = $('input[name=produccion]:checked', '#formulario').val();
+    var errorRecurso = document.getElementById("errorRecursos");
+
+    if(titulo.value == ""){
+        titulo.setAttribute("style","border-color: red");
+        errorTitulo.innerHTML = "El campo titulo es obligatorio";
+    }else{
+        titulo.removeAttribute("style");
+        errorTitulo.innerHTML = "";
+    }
+
+    if(publicacion.value == ""){
+        publicacion.setAttribute("style","border-color: red");
+        errorPubli.innerHTML = "El campo publicación es obligatorio";
+    }else{
+        publicacion.removeAttribute("style");
+        errorPubli.innerHTML = "";
+    }
+
+    if(radioRecurso == undefined){
+        errorRecurso.innerHTML = "Debes marcar un recurso";
+    }else{
+        errorRecurso.innerHTML = "";
+    }
+
+    if((titulo.value != "") && (publicacion.value  != "") && (radioRecurso != undefined)){
+
+        var arrayCategoriasAsociar = [];
+
+        for(var i = 0; i < arrayCategorias.length; i++){
+            var boolean = false;
+            var categorias = video.categories;
+            var categoria = categorias.next();
+
+            while ((categoria.done !== true) && (!boolean)){
+                if (categoria.value.name == arrayCategorias[i]) {
+
+                    arrayCategoriasAsociar.push(categoria.value);
+
+                    boolean = true;
+                }
+                categoria = categorias.next();
+            }
+        }
+
+        var arrayActorAsociar = [];
+
+        for(var i = 0; i < arrayActores.length; i++){
+            var boolean = false;
+            var actores = video.actors;
+            var actor = actores.next();
+
+            while ((actor.done !== true) && (!boolean)){
+                if (actor.value.name == arrayActores[i]) {
+
+                    arrayActorAsociar.push(actor.value);
+            
+                    boolean = true;
+                }
+                actor = actores.next();
+            }
+        }
+
+        var arrayDirectorAsociar = [];
+
+        for(var i = 0; i < arrayDirectores.length; i++){
+            var boolean = false;
+            var directores = video.directors;
+            var director = directores.next();
+
+            while ((director.done !== true) && (!boolean)){
+                if (director.value.name == arrayDirectores[i]) {
+
+                    arrayDirectorAsociar.push(director.value);
+            
+                    boolean = true;
+                }
+                director = directores.next();
+            }
+        }
+
+        for(var i = 0; i < arrayRecursos.length; i++){
+            if(radioRecurso == arrayRecursos[i].duration){
+                var recurso = arrayRecursos[i];
+            }
+        }
+        
+        try{
+            var movie = new Movie(titulo.value,nacionalidad,new Date(publicacion.value),synopsis,imagen,recurso,new Coordinate(arrayLoca[0],arrayLoca[1]));
+
+            video.addProduction(movie);
+
+            for(let i = 0; i < arrayCategoriasAsociar.length; i++){
+                video.assignCategory(arrayCategoriasAsociar[i],movie);
+            }
+
+            for(let i = 0; i < arrayActorAsociar.length; i++){
+                video.assignActor(arrayActorAsociar[i],movie);
+            }
+
+            for(let i = 0; i < arrayDirectorAsociar.length; i++){
+                video.assignDirector(arrayDirectorAsociar[i],movie);
+            }
+
+            excepcion.innerHTML = "Pelicula añadida con éxito.";
+        }catch(error){
+            excepcion.innerHTML = error.message;
+        }
+
+    }
 }
 
 function FormEliminarProd(){
@@ -1675,6 +2552,9 @@ function FormEliminarProd(){
 
 	var formulario = document.createElement("form");
 	formulario.setAttribute("id","formulario");
+	var p = document.createElement("p");
+	p.setAttribute("id","excepcion");
+	p.setAttribute("class","text-center font-weight-bold");
 	var tabla = document.createElement("table");
 	tabla.setAttribute("class","table table-bordered table-hover");
 	var thead = document.createElement("thead");
@@ -1687,6 +2567,7 @@ function FormEliminarProd(){
     tbody.setAttribute("id","miTabla");
 
 	contenido.appendChild(formulario);
+	formulario.appendChild(p);
 	formulario.appendChild(tabla);
 	tabla.appendChild(thead);
 	tabla.appendChild(tr);
@@ -1709,11 +2590,13 @@ function FormEliminarProd(){
 			var tdTitulo = document.createElement("td");
 			tdTitulo.appendChild(document.createTextNode(production.value.title));
 			var td = document.createElement("td");
+			td.setAttribute("id","botonesEliminar" + production.value.title);
+			td.setAttribute("style","width:30%;");
 			var button = document.createElement("button");
 			button.setAttribute("type","button");
 			button.setAttribute("class","btn botonBorrar p-0");
 			button.setAttribute("value",production.value.title);
-			//button.addEventListener("click", EliminarProd);
+			button.addEventListener("click", BotonesEliminar);
 
 			var img = document.createElement("img");
 			img.setAttribute("class","img-fluid");
@@ -1736,7 +2619,65 @@ function FormEliminarProd(){
 }
 
 function EliminarProd(){
+	var contenidoBorrar = this.value;
+	var excepcion = document.getElementById("excepcion");
+	var boolean = false;
 
+	var producciones = video.productions;
+	var produccion = producciones.next();
+
+	while((produccion.done != true) && (!boolean)){
+		if(produccion.value.title == contenidoBorrar){
+			var prodBorrar = produccion.value;
+
+			var categorias = video.categories;
+			var categoria = categorias.next();
+
+			while(categoria.done != true){
+				var productions = video.getProductionsCategory(categoria.value);
+				var production = productions.next();
+
+				while(production.done != true){
+					if(production.value.title === contenidoBorrar){
+						video.deassignCategory(categoria.value,prodBorrar);
+					}
+					production = productions.next();
+				}
+				categoria = categorias.next();
+			}
+
+			var elenco = video.getCast(produccion.value);
+			var actor = elenco.next();
+			while(actor.done != true){
+				video.deassignActor(actor.value, prodBorrar);
+				actor = elenco.next();
+			}
+
+			var directores = video.directors;
+			var director = directores.next();
+			while(director.done != true){
+				var productions = video.getProductionsDirector(director.value);
+				var production = productions.next();
+
+				while(production.done != true){
+					if(production.value.title === contenidoBorrar){
+						video.deassignDirector(director.value,prodBorrar);
+					}
+					production = productions.next();
+				}
+				director = directores.next();
+			}
+			boolean = true;
+		}
+		director = directores.next();
+	}
+
+	try{
+		video.removeProduction(prodBorrar);
+		excepcion.innerHTML = "Producción eliminada con éxito.";
+	}catch(error){
+		excepcion.innerHTML = error.message;
+	}
 }
 
 function FormAñadirRecurso(){
@@ -1753,4 +2694,73 @@ function FormEliminarRecurso(){
 
 function EliminarRecurso(){
 	
+}
+
+function BotonesEliminar(){
+	var tdCambiar = document.getElementById("botonesEliminar" + this.value);
+	var valorBoton = this.value; //Recogemos el valor del boton para eliminar
+
+	var titulo = document.getElementById("tituloprincipal").innerHTML;
+	var comprobar = titulo.substring(9,10).trim();
+
+	while(tdCambiar.firstChild){
+		//Eliminamos siempre el primer hijo hasta que ya no tenga hijos
+		tdCambiar.removeChild(tdCambiar.firstChild); 
+	}
+	var buttonA = document.createElement("button");
+	buttonA.setAttribute("type","button");
+	buttonA.setAttribute("class","btn botonAceptarCancelar");
+	buttonA.setAttribute("value",valorBoton);
+	buttonA.appendChild(document.createTextNode("Aceptar"));
+
+	if(comprobar == "C"){
+		buttonA.addEventListener("click", EliminarCategoria);
+	}
+	
+	if(comprobar == "A"){
+		buttonA.addEventListener("click", EliminarActor);
+	}
+
+	if(comprobar == "D"){
+		buttonA.addEventListener("click", EliminarDirector);
+	}
+
+	if(comprobar == "P"){
+		buttonA.addEventListener("click", EliminarProd);
+	}
+
+	var buttonC = document.createElement("button");
+	buttonC.setAttribute("type","button");
+	buttonC.setAttribute("class","btn botonAceptarCancelar");
+	buttonC.setAttribute("value",valorBoton);
+	buttonC.appendChild(document.createTextNode("Cancelar"));
+	buttonC.addEventListener("click", MostrarPapelera);
+
+	tdCambiar.appendChild(buttonA);
+	tdCambiar.appendChild(buttonC);
+}
+
+function MostrarPapelera(){
+	var tdCambiar = document.getElementById("botonesEliminar" + this.value);
+	var valorBoton = this.value; //Recogemos el valor del boton para eliminar
+
+	while(tdCambiar.firstChild){
+		//Eliminamos siempre el primer hijo hasta que ya no tenga hijos
+		tdCambiar.removeChild(tdCambiar.firstChild); 
+	}
+
+	var button = document.createElement("button");
+	button.setAttribute("type","button");
+	button.setAttribute("class","btn botonBorrar p-0");
+	button.setAttribute("value",valorBoton);
+	button.addEventListener("click", BotonesEliminar);
+
+	var img = document.createElement("img");
+	img.setAttribute("class","img-fluid");
+	img.setAttribute("src","img/eliminar.png");
+	img.setAttribute("alt",valorBoton);
+	img.setAttribute("style","width: 25px;");
+
+	tdCambiar.appendChild(button);
+	button.appendChild(img);
 }

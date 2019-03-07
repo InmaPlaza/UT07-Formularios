@@ -28,3 +28,6 @@
 ## Version 1.0.0
  - Creacion del fichero Formularios.js
  - Añadir algo de funcionalidad al fichero Formularios.js
+
+## Version 1.0.1
+ - Correccion de errores del fichero Formularios.js

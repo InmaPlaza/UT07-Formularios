@@ -115,6 +115,7 @@ h1.my-4{
     border: 1px solid #8EAEBF;
     background-color: #8EAEBF;
     width: 100%;
+    margin-top: 10px;
 }
 
 .botonBorrar{
@@ -124,4 +125,23 @@ h1.my-4{
 
 .error{
     color: red;
+}
+
+.botonAceptarCancelar{
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #8EAEBF;
+    background-color: #8EAEBF;
+    padding: 5px;
+    margin: 0% 2%;
+}
+
+.BotonSeriePelicula{
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #8EAEBF;
+    background-color: #8EAEBF;
+    padding: 5px;
+    margin: 0% 2%;
+    width: 25%;
 }
