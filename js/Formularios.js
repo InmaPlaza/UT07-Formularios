@@ -1,5 +1,4 @@
 var video = VideoSystem.getInstance();
-document.cookie = "username=prueba;"; //Para la entrega lo tengo que borrar
 
 function formularioIS(){
 	var contenido = document.getElementById("formularioInicioSesion");
@@ -988,7 +987,7 @@ function AñadirActor(){
 	var apellido2 = document.getElementById("Apellido2A").value;
 	var fecha = document.getElementById("Date");
 	var imagen = document.getElementById("Imagen").value;
-	var prod = $('input[name=produccion]:checked', '#myForm').val();
+	var prod = $('input[name=produccion]:checked', '#formulario').val();
 	var errorNombre = document.getElementById("errorNombre");
 	var errorAp1 = document.getElementById("errorAp1");
 	var errorFecha = document.getElementById("errorFecha");

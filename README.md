@@ -31,3 +31,6 @@
 
 ## Version 1.0.1
  - Correccion de errores del fichero Formularios.js
+
+## Version 1.0.2
+ - Correcion de errores de ultima hora.
