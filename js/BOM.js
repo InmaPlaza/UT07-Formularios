@@ -1,56 +1,76 @@
+//Crea una ventana
+function crearVentana(nombre){
+	var ventanaNueva = window.open("Recursos.html",nombre,"toolbar=yes,scrollbars=yes,resizable=yes,width=640,height=670");
+	ventanas.push(ventanaNueva);
+}//Fin de crearVentana
+
 var ventanas = [];
 
-/*Funcion que permite abrir una nueva ventana*/
-function abrirVentana(nombreProduccion){
-	//console.log(nombreProduccion);
-	var ventana;
-	var boolean = false;
+//Abre una nueva ventana
+function abrirVentana(){
+	var index = 0;
+	var encontrada = false;
+	//Si es la primera vez que se ejecuta la funcion crea directamente la ventana
+	if(ventanas[0] == undefined){
+		crearVentana(this.value);
+	}else{
+		while ((index < ventanas.length) || encontrada) {
+			if (ventanas[index] && !ventanas[index].closed && ventanas[index] == this.value){
+				//Si la ventana no esta cerrada, esta creada y ya tiene ese nombre
+				encontrada = true;
+			}
+			index++;
+		}
 
-	for(var i = 0; i<ventanas.length; i++){
-		/*Si el nombre de la ventana y el nombre de la produccion son iguales y existe la ventana
-		y la ventana no esta cerrada.*/
-		if((ventanas[i].name === nombreProduccion) && ventanas[i] && (!ventanas[i].closed)){
-			ventanas[i].focus(); //Le ponemos a la ventana el focus
-			boolean = true; //Cambiamos el valor de encontrada a true
+		if (encontrada) {
+			ventanas[index].focus();
+		}else{
+			crearVentana(this.value);
 		}
 	}
-    if (!boolean){
-        //Abre una ventana nueva con una con nombre y características.
-		ventana = window.open("Recursos.html",nombreProduccion,"toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=600,height=600");
-		ventanas.push(ventana);
-    }
-}
 
-/*Funcion que te permite cerrar todas las ventanas*/
+}//Fin de abrir ventana
+
+//Cierra las ventanas abiertas
 function cerrarVentanas(){
-	for(var i = 0; i<ventanas.length; i++){
-		if(!ventanas[i].closed){
-			ventanas[i].close();
+	for (let index = 0; index < ventanas.length; index++) {
+		//Si la ventana no esta cerrada la cierra
+		if (!ventanas[index].closed) {
+			ventanas[index].close();	
 		}
 	}
-}
+}//FIn de cerrarVentanas
 
-//Funcion que muestra los recursos relacionados con una producción.
+//Muestra los recursos relacionados con una producción en una nueva ventana
+//Esta funcion se ejecuta al cargar la ventana
 function showResource(){
-    var tituloPrincipal = window.opener.document.getElementById("tituloprincipal").innerHTML;
-	document.getElementById("tituloprincipal").innerHTML = tituloPrincipal; 
+	//Se recoge el titulo de la produccion
+	var tituloProduccion = document.getElementById("tituloprincipal");
 
-	//Recogemos el elemento a partir del cual empezaremos a pintar
-	var contenido = document.getElementById("tarjetasprincipal");
+	console.log(tituloProduccion.innerHTML);
+	
+	//Se recorre el array de ventanas 
+	for (let index = 0; index < ventanas.length; index++) {
+		//Si el titulo es igual a la ventana que haya en el array
+		if (ventanas[index].name == tituloProduccion.textContent) {
+			//Selecciona la zona de la ventana nueva
+			var ventana = ventanas[index];
+		}
+	}
 
-	var video = window.opener.VideoSystem.getInstance();
+	var contenidoVentana = ventana.document.getElementById("contenidoZona");
+	//Cambia el titulo de la ventana
+	ventana.document.title = "Recursos de " + tituloProduccion.textContent;
 
-	//Recogemos en variables el iterador de producciones
+	var video = VideoSystem.getInstance();
+	var encontrado = false;
 	var producciones = video.productions;
 	var produccion = producciones.next();
 
-	var encontrado = false;
-
-	//Mientras existan producciones y encontrado= false
-	while((produccion.done !== true) && (!encontrado)){ 
-		//Si el titulo de la produccion es igual al titulo recogido al principio
-		if(produccion.value.title == tituloPrincipal){
-			//Creamos el contenido de cada tarjeta
+	while ((produccion.done !== true) && (!encontrado)){
+		//Compara el titulo de la produccion del iterador con el titulo que hay en el h2 de la tarjeta
+		if (produccion.value.title == tituloProduccion.textContent) {
+			//Si la produccion es una movie tendra unos parametros distintos a las series
 			var div = document.createElement("div");
 			div.setAttribute("class","col-lg-12 col-md-12 mb-4");
 					
@@ -66,8 +86,8 @@ function showResource(){
 			img.setAttribute("height","400");
 			img.setAttribute("alt",produccion.value.title);
 
-			var div2 = document.createElement("div");
-			div2.setAttribute("class","card-body");
+			var cuerpo = document.createElement("div");
+			cuerpo.setAttribute("class","card-body");
 					
 			var button = document.createElement("button");
 			button.setAttribute("type","button");
@@ -83,21 +103,62 @@ function showResource(){
 			recurso.appendChild(document.createTextNode("Recurso: " + produccion.value.resource));
 
 			//Añadimos los elementos al contenido principal
-			contenido.appendChild(div);
+			contenidoVentana.appendChild(div);
 			div.appendChild(divImagen);
 			divImagen.appendChild(divNuevo);
 			divNuevo.appendChild(img);
-			divImagen.appendChild(div2);
-			div2.appendChild(button);
-			div2.appendChild(titulo);
-			div2.appendChild(recurso);
+			divImagen.appendChild(cuerpo);
+			cuerpo.appendChild(button);
+			cuerpo.appendChild(titulo);
 
-			encontrado = true;
-		}
+			if(produccion.value instanceof Movie){
+				//Si es distinto de null pone el recurso de la produccion
+				if(produccion.value.resource != null){
+					var resource = document.createElement("p");
+					resource.setAttribute("class","card-text");
 
-		//Llamamos al iterador para pasar a la siguiente produccion
+					/* SIPNOSIS DE LA PRODUCCION */ 
+					resource.appendChild(document.createTextNode("Recurso: " + produccion.value.resource));
+					cuerpo.appendChild(resource);
+				}
+				//Si es distinto de null pone la localizacion de la produccion
+				if(produccion.value.locations != null){
+					var locations = document.createElement("p");
+					locations.setAttribute("class","card-text");
+
+					/* SIPNOSIS DE LA PRODUCCION */ 
+					locations.appendChild(document.createTextNode("Localizacion: " + produccion.value.locations));
+					cuerpo.appendChild(locations);
+				}
+			}//Fin del instanceof
+
+			if(produccion.value.seasons != null){
+				//Si tiene temporadas las muestra
+				
+				for (let index = 0; index < produccion.value.seasons.length; index++) {
+					var season = document.createElement("p");
+					season.setAttribute("class","cajaTitulo");
+					season.appendChild(document.createTextNode("Temporada "+(index+1)+":"));
+					
+					cuerpo.appendChild(season);
+
+					for(let indexArray = 0; indexArray < produccion.value.seasons[index].episodes.length; indexArray++){
+						var episodio = document.createElement("p");
+						episodio.setAttribute("class","cajaDescripcion");
+						
+						var concatenar = produccion.value.seasons[index].episodes[indexArray].title + ": " 
+						+ produccion.value.seasons[index].episodes[indexArray].episode + " ";
+
+						for(let indexCoor = 0; indexCoor < produccion.value.seasons[index].episodes[indexArray].scenarios.length; indexCoor++){
+							concatenar += produccion.value.seasons[index].episodes[indexArray].scenarios[indexCoor] + " ";
+						}
+
+						episodio.appendChild(document.createTextNode(concatenar));
+						cuerpo.appendChild(episodio);
+					}
+				}
+			}
+		}//Fin del if
 		produccion = producciones.next();
-	}
-
-}
-window.onload = showResource();
+	}//Fin del while
+}//Fin de showResource
